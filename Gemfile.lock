@@ -1,0 +1,19 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    bk (1.0.0)
+      text
+    rambling-trie (0.8.0)
+    terminal-table (1.5.2)
+    text (1.3.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bk
+  rambling-trie
+  terminal-table
+
+BUNDLED WITH
+   1.10.6
