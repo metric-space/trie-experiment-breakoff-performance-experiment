@@ -2,6 +2,7 @@ require 'rambling-trie'
 require 'bk'
 require 'benchmark'
 require 'terminal-table'
+require 'parallel'
 
 dictionary_file = "dictionary.txt" 
 
@@ -15,11 +16,11 @@ end
 
 trieNaive = Rambling::Trie.create 
 trieSplit = {}
-trieConcurrent = {}
+trieParallel = {}
 
 bkNaive = BK::Tree.new
 bkSplit = {}
-bkConcurrent = {}
+bkParallel = {}
 
 
 ######## the native approach ########
@@ -56,6 +57,26 @@ timeBkSplit = Benchmark.realtime do
  end
 end
 
+########## the parallel approach ######################
+
+timeTrieParallel = Benchmark.realtime do
+  # wordsMap :: Map Char [String]
+  wordsMap = array_of_words.group_by {|x| x[0]}
+  Parallel.map(wordsMap.keys) do |i|
+    trieParallel[i] = Rambling::Trie.create 
+    wordsMap[i].map {|x| trieParallel[i] <<  x}
+  end 
+end
+
+timeBkParallel = Benchmark.realtime do
+  # wordsMap :: Map Char [String]
+  wordsMap = array_of_words.group_by {|x| x[0]}
+  Parallel.map(wordsMap.keys) do |i|
+    bkParallel[i] = BK::Tree.new 
+    wordsMap[i].map {|x| bkParallel[i].add  x}
+  end 
+end
+
 
 
 rowsNaive = []
@@ -69,7 +90,15 @@ rowsSplit << ['Trie' ,timeTrieSplit]
 rowsSplit << ['BK' , timeBkSplit]
 tableSplit = Terminal::Table.new title: "Split Approach", headings: ['structure','time'], rows: rowsSplit
 
+rowsParallel = []
+rowsParallel << ['Trie' ,timeTrieParallel]
+rowsParallel << ['BK' , timeBkParallel]
+tableParallel = Terminal::Table.new title: "Parallel Approach", headings: ['structure','time'], rows: rowsParallel
+
+
 puts tableNaive
 puts "\n\n"
 puts tableSplit
+puts "\n\n"
+puts tableParallel
 puts "\n\n"
