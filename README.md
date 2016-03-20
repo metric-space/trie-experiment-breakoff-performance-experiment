@@ -58,6 +58,9 @@ The averages seem to be as follows
 
 ```
 
+### Conclusion
+
+All the approaches for trying to reduce the intitiation time for the `trie` structures fails but works superbly for the `bk tree` data structure
 
 
  
