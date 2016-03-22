@@ -10,9 +10,10 @@ file = File.open(dictionary_file,'r')
 
 array_of_words = []
 while (line = file.gets) 
-  array_of_words << line.split("\n")[0]
+  array_of_words << line.strip.downcase
 end
 
+puts array_of_words
 
 trieNaive = Rambling::Trie.create 
 trieSplit = {}
@@ -62,7 +63,7 @@ end
 timeTrieParallel = Benchmark.realtime do
   # wordsMap :: Map Char [String]
   wordsMap = array_of_words.group_by {|x| x[0]}
-  Parallel.map(wordsMap.keys) do |i|
+  Parallel.map(wordsMap.keys,:in_threads => 100) do |i|
     trieParallel[i] = Rambling::Trie.create 
     wordsMap[i].map {|x| trieParallel[i] <<  x}
   end 
@@ -71,7 +72,7 @@ end
 timeBkParallel = Benchmark.realtime do
   # wordsMap :: Map Char [String]
   wordsMap = array_of_words.group_by {|x| x[0]}
-  Parallel.map(wordsMap.keys) do |i|
+  Parallel.map(wordsMap.keys, :in_threads => 100) do |i|
     bkParallel[i] = BK::Tree.new 
     wordsMap[i].map {|x| bkParallel[i].add  x}
   end 
